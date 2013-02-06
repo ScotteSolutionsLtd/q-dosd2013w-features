@@ -1,0 +1,26 @@
+.node-type-photo-album h1#page-title {
+  margin-left:50px;
+  margin-right:1px;
+}
+.node-type-photo-album .node-photo-album {
+  width: 90%;
+  margin:0 auto;
+  text-align:left;
+}
+.node-photo-album .field-name-field-albumimages {
+  text-align:center;
+  clear:both;
+  display:block;
+}
+#topbut {
+}
+.field-name-field-return-to-top-link:not(.node-photo_album-form .field-name-field-return-to-top-link) {
+  float:right;
+  margin-right:-50px;
+}
+.field-name-field-return-to-top-link:not(.node-photo_album-form .field-name-field-return-to-top-link) a:link{
+  border:1px solid #000;
+  border-radius:5px;
+  padding:15px;
+  background-color:#efefef;
+}
