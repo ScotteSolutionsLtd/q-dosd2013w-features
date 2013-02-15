@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * partner.features.taxonomy.inc
+ * partner_with_screenshot.features.taxonomy.inc
  */
 
 /**
  * Implements hook_taxonomy_default_vocabularies().
  */
-function partner_taxonomy_default_vocabularies() {
+function partner_with_screenshot_taxonomy_default_vocabularies() {
   return array(
     'industry' => array(
       'name' => 'Industry',

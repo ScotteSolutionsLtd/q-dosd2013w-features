@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the partner with screenshot feature.
+ */
+
+include_once 'partner_with_screenshot.features.inc';

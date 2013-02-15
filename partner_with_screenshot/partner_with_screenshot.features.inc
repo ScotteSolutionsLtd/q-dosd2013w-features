@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * partner.features.inc
+ * partner_with_screenshot.features.inc
  */
 
 /**
  * Implements hook_node_info().
  */
-function partner_node_info() {
+function partner_with_screenshot_node_info() {
   $items = array(
     'partner' => array(
       'name' => t('Partner'),
