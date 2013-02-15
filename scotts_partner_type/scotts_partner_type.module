@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the scotts_partner_type feature.
+ */
+
+include_once 'scotts_partner_type.features.inc';
