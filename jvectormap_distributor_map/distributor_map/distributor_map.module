@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Distributor Map feature.
+ */
+
+include_once 'distributor_map.features.inc';

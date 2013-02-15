@@ -1,0 +1,7 @@
+name = Views Jvectormap
+description = Jvectormap plugin display
+core = 7.x
+package = Views
+files[] = views/views_plugin_style_jvectormap.inc
+files[] = views/views_jvectormap.views.inc
+files[] = views-view-jvectormap.inc

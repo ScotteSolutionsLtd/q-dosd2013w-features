@@ -1,0 +1,247 @@
+<?php
+
+/**
+ * Implements hook_views_api().
+ */
+function views_jvectormap_views_api() {
+  return array(
+    'api' => views_api_version(),
+    'path' => drupal_get_path('module', 'views_jvectormap') . '/views'
+  );
+}
+
+function views_jvectormap_theme($existing, $type, $theme, $path) {
+  //xdebug_break();
+
+  return array(
+    'jvectormap' => array(
+      'variables' => array('variables' => array()),
+    ),
+  );
+}
+
+function theme_jvectormap($variables) {
+  // Set static variable. Used so that more maps may exist.
+  static $jvectormap_incr;
+  $jvectormap_incr++;
+
+  // Give some JS library status
+  $js_options = array('group' => JS_LIBRARY);
+
+  unset($variables['raw']);
+  drupal_add_js(array('Jvectormap' => $variables), 'setting');
+
+
+  // Mousewheel support. Might write out.
+  drupal_add_js(drupal_get_path('module', 'views_jvectormap') . '/js/jquery.mousewheel.min.js', $js_options);
+
+  //drupal_add_js(cmap_color_data(), 'inline');
+  // Jvectormap main css & js
+  drupal_add_css(drupal_get_path('module', 'views_jvectormap') . '/jvectormap/jquery-jvectormap.css');
+  drupal_add_js(drupal_get_path('module', 'views_jvectormap') . '/jvectormap/jquery-jvectormap.js', $js_options);
+
+  // The worldmap data.
+  // @todo maybe write this in a more clever way.
+  drupal_add_js(drupal_get_path('module', 'views_jvectormap') . '/jvectormap/tests/assets/jquery-jvectormap-world-en.js');
+	
+	// US Map
+  drupal_add_js(drupal_get_path('module', 'views_jvectormap') . '/jvectormap/tests/assets/jquery-jvectormap-us-en.js');
+	
+  drupal_add_js(drupal_get_path('module', 'views_jvectormap') . '/js/views.jvectormap.js');
+  //drupal_add_css(drupal_get_path('module', 'cmap') . '/cmap-field.css');
+  return "<div id='jvectormap-$jvectormap_incr' style='height:400px;'></div>";
+}
+
+/**
+ * Prepares a views result, so that it can be parsed to JS
+ */
+function views_jvectormap_prepare_data($result, $js_settings) {
+  return $result;
+}
+
+//function views_jvectormap_js_alter(&$javascript) {
+//  dpm("alter");
+//  // Swap out jQuery to use an updated version of the library.
+//  $javascript['misc/jquery.js']['data'] = drupal_get_path('module', 'views_jvectormap') . '/jvectormap/tests/assets/jquery-1.7.2.min.js';
+//}
+
+/**
+ * Takes each field from a row object and renders the field as determined by the field's theme
+ *
+ * @param $view
+ *   View the row belongs to
+ * @param $row
+ *   Row object
+ * @return array
+ *   Object containing all the raw and rendered fields
+ */
+function _views_jvectormap_render_fields($view, $row) {
+  $field_ids = array_keys($view->field);
+  $rendered_fields = array();
+  foreach ($field_ids as $id) {
+    $field = $view->field[$id];
+    $field_is_multiple = FALSE;
+    $field_raw = array();
+    if ((isset($field->options['multiple']['group'])) && isset($field->field_values)) {
+      $field_output = _views_json_render_multiple_field($field, $row);
+      $n = 0;
+      if (is_array($field_output)) {
+        foreach ($field->field_values[$row->{$field->field_alias}] as $item) {
+          $field_raw[++$n] = $item["value"];
+        }
+        $field_is_multiple = TRUE;
+      }
+      else
+        $field_raw = $view->field[$field->options['id']]->advanced_render($row);
+    }
+    else {
+      $field_output = $view->field[$field->options['id']]->advanced_render($row);
+      $field_raw = (isset($view->field[$id]->field_alias) && isset($row->{$view->field[$id]->field_alias})) ? $row->{$view->field[$id]->field_alias} : NULL;
+    }
+
+    $img_match = array();
+    $src_match = array();
+    if (is_array($field_output)) {
+      foreach ($field_output as $i => $f) {
+        if (preg_match("/<img[^>]+>/i", $f, $img_match)) {
+          if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
+            $field_output[$i] = ($src_match[2]);
+        }
+      }
+    }
+    else {
+      if (preg_match("/<img[^>]+>/i", $field_output, $img_match)) {
+        if (preg_match('/(src)="([^"]*)"/i', $img_match[0], $src_match))
+          $field_output = ($src_match[2]);
+      }
+    }
+
+    if (empty($field->options['exclude'])) {
+      if (empty($field->options['exclude']) && !($field->options['hide_empty'] && (empty($field_output)))) {
+        $object = new stdClass();
+        $object->id = $id;
+        // Respect the 'empty' value if empty and "No results text" is given.
+        if (empty($field_output) && $field->options['empty']) {
+          $object->content = $field->options['empty'];
+        }
+        else {
+          $object->content = $field_output;
+        }
+        $object->raw = $field_raw;
+        $object->class = drupal_clean_css_identifier(strtolower($id)); //views_css_safe($id);
+        $object->label = check_plain($view->field[$id]->label());
+        $object->is_multiple = $field_is_multiple;
+        $rendered_fields[$id] = $object;
+      }
+    }
+  }
+  return $rendered_fields;
+}
+function get_province($iso2) {
+  $all_states = array(
+      ''   => t('--'),
+      'AL' => t('Alabama'),
+      'AK' => t('Alaska'),
+      'AZ' => t('Arizona'),
+      'AR' => t('Arkansas'),
+      'CA' => t('California'),
+      'CO' => t('Colorado'),
+      'CT' => t('Connecticut'),
+      'DE' => t('Delaware'),
+      'DC' => t('District Of Columbia'),
+      'FL' => t('Florida'),
+      'GA' => t('Georgia'),
+      'HI' => t('Hawaii'),
+      'ID' => t('Idaho'),
+      'IL' => t('Illinois'),
+      'IN' => t('Indiana'),
+      'IA' => t('Iowa'),
+      'KS' => t('Kansas'),
+      'KY' => t('Kentucky'),
+      'LA' => t('Louisiana'),
+      'ME' => t('Maine'),
+      'MD' => t('Maryland'),
+      'MA' => t('Massachusetts'),
+      'MI' => t('Michigan'),
+      'MN' => t('Minnesota'),
+      'MS' => t('Mississippi'),
+      'MO' => t('Missouri'),
+      'MT' => t('Montana'),
+      'NE' => t('Nebraska'),
+      'NV' => t('Nevada'),
+      'NH' => t('New Hampshire'),
+      'NJ' => t('New Jersey'),
+      'NM' => t('New Mexico'),
+      'NY' => t('New York'),
+      'NC' => t('North Carolina'),
+      'ND' => t('North Dakota'),
+      'OH' => t('Ohio'),
+      'OK' => t('Oklahoma'),
+      'OR' => t('Oregon'),
+      'PA' => t('Pennsylvania'),
+      'RI' => t('Rhode Island'),
+      'SC' => t('South Carolina'),
+      'SD' => t('South Dakota'),
+      'TN' => t('Tennessee'),
+      'TX' => t('Texas'),
+      'UT' => t('Utah'),
+      'VT' => t('Vermont'),
+      'VA' => t('Virginia'),
+      'WA' => t('Washington'),
+      'WV' => t('West Virginia'),
+      'WI' => t('Wisconsin'),
+      'WY' => t('Wyoming'),
+      ' ' => t('--'),
+      'AS' => t('American Samoa'),
+      'FM' => t('Federated States of Micronesia'),
+      'GU' => t('Guam'),
+      'MH' => t('Marshall Islands'),
+      'MP' => t('Northern Mariana Islands'),
+      'PW' => t('Palau'),
+      'PR' => t('Puerto Rico'),
+      'VI' => t('Virgin Islands'),
+    );
+		return $all_states[$iso2];
+}
+function views_jvectormap_jvectormap_data_alter(&$data, $raw){
+
+  if (arg(0) =='usa-distributors') {
+  $newdata = array_keys($data['data']);
+
+// call a view with 2 args to display the distributors for the given country/state
+ foreach($data['data'] AS $rCode => $rData){
+	if (!empty($rCode)) {
+  	$distrib_info = views_get_view('distributors', TRUE);
+		$distrib_info->set_display('page');
+    $distrib_info->args = array('US', $rCode);
+    $distrib_info->pre_execute();
+    $distrib_info->execute();
+		$output = $distrib_info->preview();
+
+	  $data['data']['US-' . ($rCode)] = $rData;
+		$data['data']['US-' . ($rCode)]['cTitle'] = $output;
+		//drupal_set_message('<pre>US ' . print_r($view_result,TRUE) . '</pre>');
+		$state_name = get_province($rCode);
+		$data['data']['US-' . ($rCode)]['cLink'] = $state_name;
+
+  }
+  }
+	
+} else {  // use the world map:
+
+ foreach($data['data'] AS $rCode => $rData){
+  	$distrib_info = views_get_view('distributors', TRUE);
+		$distrib_info->set_display('page');
+    $distrib_info->args = array($rCode);
+    $distrib_info->pre_execute();
+    $distrib_info->execute();
+		$output = $distrib_info->preview();
+
+	  $data['data'][$rCode] = $rData;
+		$data['data'][$rCode]['cTitle'] = $output;
+		$state_name = country_load($rCode)->name;
+	  //$state_name = $namez;
+		$data['data'][$rCode]['cLink'] = $state_name;
+  }
+}
+}
