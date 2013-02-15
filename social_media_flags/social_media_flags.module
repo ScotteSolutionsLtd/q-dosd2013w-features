@@ -1,7 +1,0 @@
-<?php
-/**
- * @file
- * Code for the Social Media Flags feature.
- */
-
-include_once 'social_media_flags.features.inc';

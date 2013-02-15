@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Our Partners feature.
+ */
+
+include_once 'laurapartners.features.inc';
