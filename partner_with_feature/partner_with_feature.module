@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Partner with feature feature.
+ */
+
+include_once 'partner_with_feature.features.inc';

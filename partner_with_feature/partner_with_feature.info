@@ -1,0 +1,13 @@
+name = Partner with feature
+description = With screenshot
+core = 7.x
+package = Features
+version = 7.x-1.0
+project = partner_with_feature
+dependencies[] = features
+dependencies[] = text
+features[ckeditor_profile][] = CKEditor Global Profile
+features[features_api][] = api:1
+features[field][] = node-features-body
+features[node][] = features
+features_exclude[dependencies][ckeditor] = ckeditor
