@@ -18,6 +18,7 @@ features[field][] = node-partners-body
 features[field][] = node-partners-field_industry
 features[field][] = node-partners-field_links
 features[field][] = node-partners-field_logo
+features[field][] = node-partners-field_screenshot
 features[field][] = node-partners-meta_description
 features[field][] = node-partners-meta_keywords
 features[node][] = partners
