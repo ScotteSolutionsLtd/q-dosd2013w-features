@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the T-Shirt Designs feature.
+ */
+
+include_once 't_shirt_designs.features.inc';
