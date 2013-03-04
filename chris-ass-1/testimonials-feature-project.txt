@@ -1,0 +1,12 @@
+Testimonial Feature 2013
+
+When this feature is applied/used you will enable a full functional testimonial tab setup in the main menu display on your site. 
+This feature shows a view of the testimonial with a title, the testimonial itself, the username, address, country, postal code, photo, and email address. This also has a link placed directly ont he page so a user can add a testimonial directly from this page.
+
+The moduals required are as follows:
+
+1. Address Field
+2. Email
+3. * Number (would be required if you wanted to add a nnumber field)
+
+
